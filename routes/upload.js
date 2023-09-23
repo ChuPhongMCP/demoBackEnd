@@ -91,7 +91,7 @@ router.get('/getLargeImg/:id', async (req, res, next) => {
 
   if (payload) return res.status(200).json({ payload });
 
-  return res.status(200).json({ message: "Không tìm thấy" });
+  return res.status(200).json({ message: "Không tìm thấy ảnh sản phẩm" });
 });
 
 router.get('/getSmallImg/:id', async (req, res, next) => {
@@ -102,7 +102,7 @@ router.get('/getSmallImg/:id', async (req, res, next) => {
 
   if (payload?.length > 0) return res.status(200).json({ payload });
 
-  return res.status(200).json({ message: "Không tìm thấy" });
+  return res.status(200).json({ message: "Không tìm thấy các ảnh nhỏ sản phẩm" });
 });
 
 router.post('/update-single/:objid', async (req, res) => {

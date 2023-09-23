@@ -140,7 +140,7 @@ module.exports = {
         return res.send(200, { message: "Tìm kiếm thành công", payload: result });
       }
 
-      return res.status(404).send({ message: `Không tìm thấy sản phẩm có ID: ${id}` });
+      return res.status(200).send({ message: `Không tìm thấy sản phẩm có ID: ${id}` });
     } catch (err) {
       res.status(500).json({
         message: 'Tìm kiếm thất bại',
@@ -174,7 +174,7 @@ module.exports = {
       }
 
       if (errors.length > 0) {
-        return res.send(200, { message: "Thêm sản phẩm thất bại", errors })
+        return res.send(200, { message: `Thêm sản phẩm thất bại, ${errors}` })
       }
 
       const newRecord = new Product(data);
@@ -232,14 +232,14 @@ module.exports = {
 
       const errors = [];
       if (!doFindSupplier) {
-        errors.push('Nhà cung cấp không khả dụng');
+        errors.push(' Nhà cung cấp không khả dụng');
       }
       if (!doFindCategory) {
-        errors.push('Danh mục không khả dụng');
+        errors.push(' Danh mục không khả dụng');
       }
 
       if (errors.length > 0) {
-        return res.send(200, { message: "Cập nhật sản phẩm thất bại", errors })
+        return res.send(200, { message: `Cập nhật sản phẩm thất bại,${errors}` })
       }
 
       // Update the product

@@ -55,7 +55,7 @@ module.exports = {
 
             if (errors.length > 0) {
                 return res.send(200, {
-                    message: `Thêm nhà cung cấp không thành công, ${errors}`,
+                    message: `Thêm nhà cung cấp không thành công,${errors}`,
                 });
             }
 
@@ -104,7 +104,7 @@ module.exports = {
             }
 
             if (errors.length > 0) {
-                return res.send(200, { message: `Cập nhật nhà cung cấp thất bại, ${errors}` })
+                return res.send(200, { message: `Cập nhật nhà cung cấp thất bại,${errors}` })
             }
 
             const updateSupplier = await Supplier.findOneAndUpdate(
