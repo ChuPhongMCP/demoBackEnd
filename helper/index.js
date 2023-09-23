@@ -15,7 +15,7 @@ const validateSchema = (schema) => async (req, res, next) => { // thực thi vi�
         return next();
     } catch (err) {
         console.log('««««« err »»»»»', err);
-        return res.status(400).json({ type: err.name, errors: err.errors, provider: "YUP" });
+        return res.status(200).json({ type: err.name, errors: err.errors, provider: "YUP" });
     }
 };
 

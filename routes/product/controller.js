@@ -174,7 +174,7 @@ module.exports = {
       }
 
       if (errors.length > 0) {
-        return res.send(400, { message: "Thêm sản phẩm thất bại", errors })
+        return res.send(200, { message: "Thêm sản phẩm thất bại", errors })
       }
 
       const newRecord = new Product(data);
@@ -239,7 +239,7 @@ module.exports = {
       }
 
       if (errors.length > 0) {
-        return res.send(400, { message: "Cập nhật sản phẩm thất bại", errors })
+        return res.send(200, { message: "Cập nhật sản phẩm thất bại", errors })
       }
 
       // Update the product
