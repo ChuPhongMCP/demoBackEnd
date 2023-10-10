@@ -61,6 +61,16 @@ app.use('/media', passport.authenticate('jwt', { session: false }), mediaRouter)
 app.use('/keySearch', passport.authenticate('jwt', { session: false }), keySearchRouter);
 app.use('/mediaS3', passport.authenticate('jwt', { session: false }), mediaS3Router);
 
+// app.use('/employees', employeesRouter);
+// app.use('/customers', customerRouter);
+// app.use('/suppliers', supplierRouter);
+// app.use('/categories', categoryRouter);
+// app.use('/authEmployee', authEmployeeRouter);
+// app.use('/products', productRouter);
+// app.use('/media', mediaRouter);
+// app.use('/keySearch', keySearchRouter);
+// app.use('/mediaS3', mediaS3Router);
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
