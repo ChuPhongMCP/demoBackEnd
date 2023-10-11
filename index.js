@@ -29,8 +29,8 @@ const {
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -51,24 +51,24 @@ passport.use(passportVerifyAccount);
 // passport.use(passportConfigBasic);
 
 app.use('/', indexRouter);
-app.use('/employees', passport.authenticate('jwt', { session: false }), employeesRouter);
-app.use('/customers', passport.authenticate('jwt', { session: false }), customerRouter);
-app.use('/suppliers', passport.authenticate('jwt', { session: false }), supplierRouter);
-app.use('/categories', passport.authenticate('jwt', { session: false }), categoryRouter);
-app.use('/authEmployee', authEmployeeRouter);
-app.use('/products', passport.authenticate('jwt', { session: false }), productRouter);
-app.use('/media', passport.authenticate('jwt', { session: false }), mediaRouter);
-app.use('/keySearch', passport.authenticate('jwt', { session: false }), keySearchRouter);
+// app.use('/employees', passport.authenticate('jwt', { session: false }), employeesRouter);
+// app.use('/customers', passport.authenticate('jwt', { session: false }), customerRouter);
+// app.use('/suppliers', passport.authenticate('jwt', { session: false }), supplierRouter);
+// app.use('/categories', passport.authenticate('jwt', { session: false }), categoryRouter);
+// app.use('/authEmployee', authEmployeeRouter);
+// app.use('/products', passport.authenticate('jwt', { session: false }), productRouter);
+// app.use('/media', passport.authenticate('jwt', { session: false }), mediaRouter);
+// app.use('/keySearch', passport.authenticate('jwt', { session: false }), keySearchRouter);
 app.use('/mediaS3', passport.authenticate('jwt', { session: false }), mediaS3Router);
 
-// app.use('/employees', employeesRouter);
-// app.use('/customers', customerRouter);
-// app.use('/suppliers', supplierRouter);
-// app.use('/categories', categoryRouter);
-// app.use('/authEmployee', authEmployeeRouter);
-// app.use('/products', productRouter);
-// app.use('/media', mediaRouter);
-// app.use('/keySearch', keySearchRouter);
+app.use('/employees', employeesRouter);
+app.use('/customers', customerRouter);
+app.use('/suppliers', supplierRouter);
+app.use('/categories', categoryRouter);
+app.use('/authEmployee', authEmployeeRouter);
+app.use('/products', productRouter);
+app.use('/media', mediaRouter);
+app.use('/keySearch', keySearchRouter);
 // app.use('/mediaS3', mediaS3Router);
 
 // catch 404 and forward to error handler

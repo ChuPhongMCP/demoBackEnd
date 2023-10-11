@@ -54,7 +54,7 @@ module.exports = {
 
         console.log('««««« req.file »»»»»', req.file);
 
-        const url = `https://pub-0e73c6f5fc4a489f88372f88f9e09175.r2.dev/demobackend/${fileName}`
+        const url = `https://pub-50cd0051de0b47509baf9c4fc482606a.r2.dev/demobackend/${fileName}`
 
         const found = await Media.findOne({ objectId: objid, type: TYPE.LARGE_IMG });
 
@@ -135,7 +135,7 @@ module.exports = {
           }
         }));
 
-        const url = `https://pub-0e73c6f5fc4a489f88372f88f9e09175.r2.dev/demobackend`
+        const url = `https://pub-50cd0051de0b47509baf9c4fc482606a.r2.dev/demobackend`
 
         const found = await Media.find({ objectId: objid, type: TYPE.SMALL_IMG });
 

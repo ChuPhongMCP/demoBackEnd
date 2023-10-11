@@ -8,7 +8,7 @@ const mediaSchema = new Schema(
     size: { type: Number, require: true },
     location: { type: String, required: true },
     employeeId: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
-    objectId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    objectId: { type: Schema.Types.ObjectId, required: true },
     type: { type: String, required: true, enum: { values: ['smallImg', 'largeImg'], } }
   },
   {
@@ -20,13 +20,6 @@ const mediaSchema = new Schema(
 mediaSchema.virtual('creator', {
   ref: 'employees',
   localField: 'employeeId',
-  foreignField: '_id',
-  justOne: true,
-});
-
-mediaSchema.virtual('object', {
-  ref: 'products',
-  localField: 'objectId',
   foreignField: '_id',
   justOne: true,
 });

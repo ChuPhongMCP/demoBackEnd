@@ -97,7 +97,6 @@ router.get('/getLargeImg/:id', async (req, res, next) => {
 router.get('/getSmallImg/:id', async (req, res, next) => {
   const { id } = req.params;
   const payload = await Media.find({ objectId: id, type: TYPE.SMALL_IMG })
-    .populate('object')
     .populate('creator');;
 
   if (payload?.length > 0) return res.status(200).json({ payload });
