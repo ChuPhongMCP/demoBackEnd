@@ -133,6 +133,16 @@ orderSchema.virtual('employee', {
   justOne: true,
 });
 
+orderSchema.virtual('totalPrice').get(function () {
+  let totalPrice = 0;
+  if (this.orderDetails && this.orderDetails.length > 0) {
+    for (let i = 0; i < this.orderDetails.length; i++) {
+      totalPrice += this.orderDetails[i].quantity * this.orderDetails[i].price;
+    }
+  }
+  return totalPrice;
+});
+
 // Virtuals in console.log()
 orderSchema.set('toObject', { virtuals: true });
 // Virtuals in JSON
