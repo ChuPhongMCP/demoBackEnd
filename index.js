@@ -20,6 +20,7 @@ const orderRouter = require('./routes/order/router');
 const mediaRouter = require('./routes/upload');
 const keySearchRouter = require('./routes/keySearch/router');
 const mediaS3Router = require('./routes/uploadUsingCFR2/router');
+const questionsRouter = require('./routes/questions/router');
 
 const {
   passportVerifyToken,
@@ -71,6 +72,7 @@ app.use('/products', productRouter);
 app.use('/orders', orderRouter);
 app.use('/media', mediaRouter);
 app.use('/keySearch', keySearchRouter);
+app.use('/questions', questionsRouter);
 // app.use('/mediaS3', mediaS3Router);
 
 // catch 404 and forward to error handler

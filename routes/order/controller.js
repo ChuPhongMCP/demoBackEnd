@@ -69,47 +69,85 @@ module.exports = {
 
   search: async (req, res, next) => {
     try {
-      const { name, categoryId, priceStart, priceEnd, supplierId } = req.query;
-      const conditionFind = { isDeleted: false };
+      const { query, startDate, endDate, page, pageSize } = req.query;
 
-      if (name) conditionFind.name = fuzzySearch(name);
+      let conditionFind = {};
 
-      if (categoryId) {
-        conditionFind.categoryId = categoryId;
-      };
+      if (query) {
+        const ObjectId = require('mongoose').Types.ObjectId;
+        const objId = new ObjectId((query.length < 12) ? "123456789012" : query);
 
-      if (supplierId) {
-        conditionFind.supplierId = supplierId;
-      };
-
-      if (priceStart && priceEnd) { // 20 - 50
-        const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
-        const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
-        conditionFind.$expr = { $and: [compareStart, compareEnd] };
-      } else if (priceStart) {
-        conditionFind.price = { $gte: parseFloat(priceStart) };
-      } else if (priceEnd) {
-        conditionFind.price = { $lte: parseFloat(priceEnd) };
+        conditionFind = {
+          ...conditionFind,
+          $or: [{ _id: objId }, { status: fuzzySearch(query) }],
+        }
       }
+
+      const total = await Order.countDocuments(conditionFind);
+      const limit = pageSize || total;
+      const skip = limit * (page - 1) || 0;
 
       console.log('««««« conditionFind »»»»»', conditionFind);
 
-      const result = await Order.find(conditionFind)
-        .populate('category')
-        .populate('supplier');
+      const results = await Order.find(conditionFind)
+        .skip(skip)
+        .limit(limit)
+        .populate("customer")
 
-      res.send(200, {
-        message: "Tìm kiếm thành công",
-        payload: result,
+      const numOfShow = results.length;
+
+      return res.send(200, { total, numOfShow, page: parseInt(page || 1), pageSize: parseInt(pageSize || limit), payload: results });
+    } catch (error) {
+      return res.status(400).json({
+        message: "Không tìm thấy!",
+        errors: error.message,
       });
-    } catch (err) {
-      console.log('««««« err »»»»»', err);
-      return res.send(404, {
-        message: "Không tìm thấy",
-        errors: err.message,
-      })
     }
   },
+
+  // search: async (req, res, next) => {
+  //   try {
+  //     const { name, categoryId, priceStart, priceEnd, supplierId } = req.query;
+  //     const conditionFind = { isDeleted: false };
+
+  //     if (name) conditionFind.name = fuzzySearch(name);
+
+  //     if (categoryId) {
+  //       conditionFind.categoryId = categoryId;
+  //     };
+
+  //     if (supplierId) {
+  //       conditionFind.supplierId = supplierId;
+  //     };
+
+  //     if (priceStart && priceEnd) { // 20 - 50
+  //       const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
+  //       const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
+  //       conditionFind.$expr = { $and: [compareStart, compareEnd] };
+  //     } else if (priceStart) {
+  //       conditionFind.price = { $gte: parseFloat(priceStart) };
+  //     } else if (priceEnd) {
+  //       conditionFind.price = { $lte: parseFloat(priceEnd) };
+  //     }
+
+  //     console.log('««««« conditionFind »»»»»', conditionFind);
+
+  //     const result = await Order.find(conditionFind)
+  //       .populate('category')
+  //       .populate('supplier');
+
+  //     res.send(200, {
+  //       message: "Tìm kiếm thành công",
+  //       payload: result,
+  //     });
+  //   } catch (err) {
+  //     console.log('««««« err »»»»»', err);
+  //     return res.send(404, {
+  //       message: "Không tìm thấy",
+  //       errors: err.message,
+  //     })
+  //   }
+  // },
 
   largeSearch: async (req, res, next) => {
     try {
@@ -172,7 +210,7 @@ module.exports = {
 
       return res.status(200).send({ message: `Không tìm thấy sản phẩm có ID: ${id}` });
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: 'Tìm kiếm thất bại',
         errors: err.message,
       });
