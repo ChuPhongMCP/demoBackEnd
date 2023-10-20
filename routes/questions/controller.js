@@ -956,9 +956,24 @@ module.exports = {
         })
         .match(conditionFind)
         .unwind('customer')
-        .addFields(
-          { 'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] } }
-        )
+        // .addFields(
+        //   { 'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] } }
+        // )
+        .addFields({
+          'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] },
+          'totalPrice': {
+            $reduce: {
+              input: '$orderDetails',
+              initialValue: 0,
+              in: {
+                $add: [
+                  '$$value',
+                  { $multiply: ['$$this.quantity', '$$this.price'] }
+                ]
+              }
+            }
+          }
+        });
 
       let total = await Order.countDocuments();
 
