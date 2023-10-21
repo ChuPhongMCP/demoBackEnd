@@ -894,7 +894,7 @@ module.exports = {
 
   question21b: async (req, res, next) => {
     try {
-      let { status, query, startDate, endDate } = req.query;
+      let { status, query, startDate, endDate, page, pageSize } = req.query;
 
       let conditionFind = {};
 
@@ -945,9 +945,12 @@ module.exports = {
         }
       }
 
+      const limit = parseInt(pageSize);
+      const skip = limit * (parseInt(page) - 1);
+
       console.log('««««« conditionFind »»»»»', conditionFind);
 
-      let results = await Order.aggregate()
+      let doQuery = await Order.aggregate()
         .lookup({
           from: 'customers',
           localField: 'customerId',
@@ -956,9 +959,6 @@ module.exports = {
         })
         .match(conditionFind)
         .unwind('customer')
-        // .addFields(
-        //   { 'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] } }
-        // )
         .addFields({
           'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] },
           'totalPrice': {
@@ -975,12 +975,17 @@ module.exports = {
           }
         });
 
-      let total = await Order.countDocuments();
+      const total = doQuery.length;
 
-      return res.send({
-        code: 200,
-        total,
-        totalResult: results.length,
+      let results = doQuery.slice(skip, skip + limit);
+
+      const totalResutl = results.length;
+
+      return res.send(200, {
+        total: total,
+        numOfShow: totalResutl,
+        page: parseInt(page || 1),
+        pageSize: parseInt(pageSize || limit),
         payload: results,
       });
     } catch (err) {

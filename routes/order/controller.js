@@ -17,8 +17,8 @@ module.exports = {
 
       const total = await Order.countDocuments(conditionFind);
 
-      const limit = pageSize || total;
-      const skip = limit * (page - 1) || 0;
+      const limit = parseInt(pageSize) || total;
+      const skip = limit * (parseInt(page) - 1) || 0;
       // const skip = limit * page - limit || 0;
 
       //page = 1, pageSize = 2, limit = 2, skip = 0
@@ -34,7 +34,13 @@ module.exports = {
 
       const numOfShow = results.length;
 
-      return res.send(200, { total, numOfShow, page: parseInt(page || 1), pageSize: parseInt(pageSize || limit), payload: results, });
+      return res.send(200, {
+        total,
+        numOfShow,
+        page: parseInt(page || 1),
+        pageSize: parseInt(pageSize || limit),
+        payload: results,
+      });
     } catch (err) {
       return res.send(404, {
         message: "Không tìm thấy order list",
