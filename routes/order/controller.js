@@ -1,5 +1,5 @@
-const { Order } = require('../../models');
-const { fuzzySearch } = require('../../helper');
+const { Order, Customer, Employee, Product } = require('../../models');
+const { fuzzySearch, asyncForEach } = require('../../helper');
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -29,6 +29,13 @@ module.exports = {
       let results = await Order.find(conditionFind)
         .skip(skip)
         .limit(limit)
+        .populate({
+          path: 'orderDetails.product',
+          populate: {
+            path: 'category',
+            model: 'categories',
+          },
+        })
         .populate("customer")
       // .lean();
 
@@ -205,16 +212,21 @@ module.exports = {
 
       let result = await Order.findOne({
         _id: id,
-        isDeleted: false,
       })
-        .populate('category')
-        .populate('supplier');
+        .populate({
+          path: 'orderDetails.product',
+          populate: {
+            path: 'category',
+            model: 'categories',
+          },
+        })
+        .populate("customer")
 
       if (result) {
         return res.send(200, { message: "Tìm kiếm thành công", payload: result });
       }
 
-      return res.status(200).send({ message: `Không tìm thấy sản phẩm có ID: ${id}` });
+      return res.status(404).send({ message: `Không tìm thấy order có ID: ${id}` });
     } catch (err) {
       return res.status(500).json({
         message: 'Tìm kiếm thất bại',
@@ -223,44 +235,174 @@ module.exports = {
     }
   },
 
+  searchCustomer: async (req, res, next) => {
+    try {
+      const { phoneNumber } = req.query;
+
+      console.log('««««« phoneNumber »»»»»', phoneNumber);
+
+      const result = await Customer.find({
+        phoneNumber,
+      })
+
+      if (result.length > 0) {
+        return res.send(200, {
+          statusCode: 200,
+          message: "search for success !!!",
+          payload: result
+        });
+      }
+
+      return res.send(404, {
+        statusCode: 404,
+        message: "not found !!!"
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        statusCode: 500,
+        message: 'Internal server error !!!',
+        errors: error.message,
+      });
+    }
+  },
+
+  createCustomer: async (req, res, next) => {
+    try {
+      const data = req.body;
+
+      console.log('««««« req.body »»»»»', req.body);
+
+      console.log('««««« data »»»»»', data);
+
+      const { email, phoneNumber } = data;
+
+      const getEmailExits = Customer.findOne({ email });
+      const getPhoneExits = Customer.findOne({ phoneNumber });
+
+      const [doGetEmailExits, doGetPhoneExits] = await Promise.all([getEmailExits, getPhoneExits]);
+
+      const errors = [];
+      if (doGetEmailExits) errors.push(' Email already exists');
+      if (doGetPhoneExits) errors.push(' Phone Number already exists');
+
+      if (errors.length > 0) {
+        return res.status(400).json({
+          statusCode: 400,
+          message: `Customer creation failed, ${errors} !!!`,
+        });
+      }
+
+      const newItem = new Customer(data);
+
+      let result = await newItem.save();
+
+      result.password = undefined;
+
+      return res.send(200, {
+        statusCode: 200,
+        message: 'Create successful customers !!!',
+        payload: result
+      });
+
+    } catch (error) {
+      console.log('««««« error »»»»»', error);
+      return res.status(500).json({
+        statusCode: 500,
+        message: "Internal server error !!!",
+        errors: error.message
+      });
+    }
+  },
+
   create: async (req, res, next) => {
     try {
       const data = req.body;
 
-      const existSupplier = Supplier.findOne({
-        _id: data.supplierId,
+      const { customerId, employeeId, orderDetails } = data;
+
+      const getCustomer = Customer.findOne({
+        _id: customerId,
         isDeleted: false,
       });
 
-      const existCategory = Category.findOne({
-        _id: data.categoryId,
+      const getEmployee = Employee.findOne({
+        _id: employeeId,
         isDeleted: false,
       });
 
-      const [doExistSupplier, doExistCategory] = await Promise.all([existSupplier, existCategory]);
+      const [customer, employee] = await Promise.all([
+        getCustomer,
+        getEmployee,
+      ]);
 
       const errors = [];
-      if (!doExistSupplier) {
-        errors.push('Nhà cung cấp không khả dụng');
-      }
-      if (!doExistCategory) {
-        errors.push('Danh mục không khả dụng');
-      }
+
+      if (!customer || customer.isDelete)
+        errors.push(' The customer does not exist !!!,');
+
+      if (!employee || employee.isDelete)
+        errors.push(' Employee does not exist !!!,');
+
+      await asyncForEach(orderDetails, async (item) => {
+        const product = await Product.findOne({
+          _id: item.productId,
+          isDeleted: false,
+        });
+
+        if (!product) errors.push(` Product ${item.productId} is not available !!!,`);
+
+        if (product && product.stock < item.quantity) errors.push(`Quantity of product ${item.productId} is not available !!!,`);
+      });
 
       if (errors.length > 0) {
-        return res.send(200, { message: `Thêm sản phẩm thất bại, ${errors}` })
+        return res.status(400).json({
+          statusCode: 400,
+          message: 'Error',
+          errors,
+        });
       }
 
       const newRecord = new Order(data);
 
-      let result = await newRecord.save();
+      const responsive = await newRecord.save();
+
+      await asyncForEach(responsive.orderDetails, async (item) => {
+        await Product.findOneAndUpdate(
+          { _id: item.productId },
+          { $inc: { stock: -item.quantity } }
+        );
+      });
+
+      const result = await Order.findOne({ _id: responsive._id })
+        .populate({
+          path: 'orderDetails.product',
+          populate: {
+            path: 'category',
+            model: 'categories',
+          },
+        })
+        .populate("customer")
+        .populate("employee");
+
+      // const result = await responsive.populate({
+      //   path: 'orderDetails.product',
+      //   populate: {
+      //     path: 'category',
+      //     model: 'categories',
+      //   },
+      // })
+      //   .populate("customer")
+      //   .execPopulate();
 
       return res.send(200, {
-        message: "Thêm sản phẩm thành công",
+        statusCode: 200,
+        message: "Create Order success !!!",
         payload: result,
       });
     } catch (err) {
       return res.send(500, {
+        statusCode: 500,
         message: "Internal server error",
         error: err.message,
       });

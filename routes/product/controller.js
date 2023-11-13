@@ -1,5 +1,6 @@
 const { Product, Category, Supplier } = require('../../models');
 const { fuzzySearch } = require('../../helper');
+// const ObjectId = require('mongodb').ObjectId;
 
 module.exports = {
   getAll: async (req, res, next) => { // NOTE
@@ -37,10 +38,61 @@ module.exports = {
     }
   },
 
+  searchForOrder: async (req, res, next) => {
+    try {
+      const { query } = req.query;
+      let conditionFind = { isDeleted: false };
+
+      if (query) {
+        const ObjectId = require('mongoose').Types.ObjectId;
+
+        if (ObjectId.isValid(query)) {
+          conditionFind = {
+            ...conditionFind,
+            _id: query,
+          }
+        } else {
+          conditionFind = {
+            ...conditionFind,
+            name: fuzzySearch(query),
+          }
+        }
+
+        // const objId = new ObjectId(!ObjectId.isValid(query) ? "123456789012" : query);
+
+        // conditionFind = {
+        //   ...conditionFind,
+        //   $or: [{ _id: objId }, { name: fuzzySearch(query) }],
+        // }
+      }
+
+      console.log('««««« conditionFind »»»»»', conditionFind);
+
+      const result = await Product.find(conditionFind)
+        .populate('category')
+        .populate('supplier');
+
+      res.send(200, {
+        message: "Tìm kiếm thành công",
+        payload: result,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.send(404, {
+        message: "Không tìm thấy",
+        errors: err.message,
+      })
+    }
+  },
+
   search: async (req, res, next) => {
     try {
-      const { name, categoryId, priceStart, priceEnd, supplierId } = req.query;
+      const { id, name, categoryId, priceStart, priceEnd, supplierId } = req.query;
       const conditionFind = { isDeleted: false };
+
+      if (id) {
+        conditionFind._id = id;
+      };
 
       if (name) conditionFind.name = fuzzySearch(name);
 

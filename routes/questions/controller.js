@@ -957,23 +957,52 @@ module.exports = {
           foreignField: '_id',
           as: 'customer',
         })
-        .match(conditionFind)
         .unwind('customer')
-        .addFields({
-          'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] },
-          'totalPrice': {
-            $reduce: {
-              input: '$orderDetails',
-              initialValue: 0,
-              in: {
-                $add: [
-                  '$$value',
-                  { $multiply: ['$$this.quantity', '$$this.price'] }
-                ]
-              }
+        .unwind({
+          path: '$orderDetails',
+          preserveNullAndEmptyArrays: true,
+        })
+        .lookup({
+          from: 'products',
+          localField: 'orderDetails.productId',
+          foreignField: '_id',
+          as: 'orderDetails.product',
+        })
+        .unwind('orderDetails.product')
+        .lookup({
+          from: 'categories',
+          localField: 'orderDetails.product.categoryId',
+          foreignField: '_id',
+          as: 'orderDetails.product.category',
+        })
+        .unwind('orderDetails.product.category')
+        .match(conditionFind)
+        .group({
+          _id: '$_id',
+          createdDate: { $first: '$createdDate' },
+          shippedDate: { $first: '$shippedDate' },
+          paymentType: { $first: '$paymentType' },
+          status: { $first: '$status' },
+          customerId: { $first: '$customerId' },
+          employeeId: { $first: '$employeeId' },
+          orderDetails: { $push: '$orderDetails' },
+          customer: { $first: '$customer' },
+        })
+      .addFields({
+        'customer.fullName': { $concat: ["$customer.firstName", " ", "$customer.lastName"] },
+        'totalPrice': {
+          $reduce: {
+            input: '$orderDetails',
+            initialValue: 0,
+            in: {
+              $add: [
+                '$$value',
+                { $multiply: ['$$this.quantity', '$$this.price'] }
+              ]
             }
           }
-        });
+        },
+      })
 
       const total = doQuery.length;
 

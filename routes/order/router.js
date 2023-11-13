@@ -12,7 +12,9 @@ const {
   create,
   update,
   softDelete,
-  restore
+  restore,
+  searchCustomer,
+  createCustomer,
 } = require('./controller');
 const {
   getDetailSchema,
@@ -24,14 +26,19 @@ const {
 } = require('./validation');
 
 router.route('/')
-.get(validateSchema(getOrderListSchema), getAll)
-.post(create)
+  .get(validateSchema(getOrderListSchema), getAll)
+  .post(create)
 
 router.route('/status')
   .get(getNumOfStatus)
 
 router.get('/search', search);
 router.post('/search', largeSearch);
+
+router.route('/search/customer')
+  .get(searchCustomer)
+router.route('/create/customer')
+  .post(createCustomer)
 
 router.route('/:id')
   .get(validateSchema(getDetailSchema), getDetail)
