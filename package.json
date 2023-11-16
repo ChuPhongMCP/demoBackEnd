@@ -1,6 +1,7 @@
 {
   "name": "doanbackend",
   "version": "0.0.0",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "nodemon ./bin/www"
   },
@@ -15,6 +16,7 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.2",
+    "moment": "^2.29.4",
     "mongodb": "^6.1.0",
     "mongoose": "^7.5.0",
     "mongoose-lean-virtuals": "^0.9.1",
