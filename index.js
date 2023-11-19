@@ -65,7 +65,7 @@ app.use('/', indexRouter);
 app.use('/mediaS3', passport.authenticate('jwt', { session: false }), mediaS3Router);
 // app.use('/vnPay', passport.authenticate('jwt', { session: false }), vnPayRouter);
 
-app.use('/employees', employeesRouter);
+app.use('/employees', passport.authenticate('jwt', { session: false }), employeesRouter);
 app.use('/customers', customerRouter);
 app.use('/suppliers', supplierRouter);
 app.use('/categories', categoryRouter);
@@ -75,6 +75,7 @@ app.use('/orders', orderRouter);
 app.use('/media', mediaRouter);
 app.use('/keySearch', keySearchRouter);
 app.use('/questions', questionsRouter);
+// app.use('/vnPay', passport.authenticate('jwt', { session: false }), vnPayRouter);
 app.use('/vnPay', vnPayRouter);
 // app.use('/mediaS3', mediaS3Router);
 
