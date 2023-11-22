@@ -13,17 +13,17 @@ const {
 } = require('./controller');
 
 const {
-  passportVerifyTokenAdmin,
-  passportVerifyAccountAdmin,
-} = require('../../middlewares/passportAdmin');
+  passportVerifyTokenUser,
+  passportVerifyAccountUser,
+} = require('../../middlewares/passportUser');
 
-passport.use('jwtAdmin', passportVerifyTokenAdmin);
-passport.use('localAdmin', passportVerifyAccountAdmin);
+passport.use('jwtUser', passportVerifyTokenUser);
+passport.use('localUser', passportVerifyAccountUser);
 
 router.route('/login')
   .post(
     validateSchema(loginSchema),
-    passport.authenticate('localAdmin', { session: false }),
+    passport.authenticate('localUser', { session: false }),
     login,
   );
 
@@ -34,7 +34,7 @@ router.route('/check-refreshtoken')
 
 router.route('/profile')
   .get(
-    passport.authenticate('jwtAdmin', { session: false }),
+    passport.authenticate('jwtUser', { session: false }),
     getMe,
   );
 

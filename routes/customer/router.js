@@ -13,7 +13,15 @@ const {
     update,
     deleted,
     restore,
+    search,
+    createGoogle,
 } = require('./controller');
+
+router.route('/search')
+    .get(search)
+
+router.route('/create-google')
+    .post(createGoogle)
 
 router.route('/')
     .get(getAll)

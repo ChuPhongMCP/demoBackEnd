@@ -15,6 +15,7 @@ const customerRouter = require('./routes/customer/router');
 const supplierRouter = require('./routes/supplier/router');
 const categoryRouter = require('./routes/category/router');
 const authEmployeeRouter = require('./routes/authEmployee/router');
+const authCustomersRouter = require('./routes/authCustomer/router');
 const productRouter = require('./routes/product/router');
 const orderRouter = require('./routes/order/router');
 const mediaRouter = require('./routes/upload');
@@ -24,10 +25,16 @@ const questionsRouter = require('./routes/questions/router');
 const vnPayRouter = require('./routes/vnPay/router');
 
 const {
-  passportVerifyToken,
-  passportVerifyAccount,
+  passportVerifyTokenAdmin,
+  passportVerifyAccountAdmin,
   // passportConfigBasic,
-} = require('./middlewares/passport');
+} = require('./middlewares/passportAdmin');
+
+const {
+  passportVerifyTokenUser,
+  passportVerifyAccountUser,
+  // passportConfigBasic,
+} = require('./middlewares/passportUser');
 
 const app = express();
 
@@ -49,8 +56,11 @@ app.use(
 
 mongoose.connect(`${process.env.DATABASE_URL}${process.env.DATABASE_NAME}`);
 
-passport.use(passportVerifyToken);
-passport.use(passportVerifyAccount);
+passport.use('jwtAdmin', passportVerifyTokenAdmin);
+passport.use('localAdmin', passportVerifyAccountAdmin);
+
+passport.use('jwtUser', passportVerifyTokenUser);
+passport.use('localUser', passportVerifyAccountUser);
 // passport.use(passportConfigBasic);
 
 app.use('/', indexRouter);
@@ -62,21 +72,22 @@ app.use('/', indexRouter);
 // app.use('/products', passport.authenticate('jwt', { session: false }), productRouter);
 // app.use('/media', passport.authenticate('jwt', { session: false }), mediaRouter);
 // app.use('/keySearch', passport.authenticate('jwt', { session: false }), keySearchRouter);
-app.use('/mediaS3', passport.authenticate('jwt', { session: false }), mediaS3Router);
+app.use('/mediaS3', mediaS3Router);
 // app.use('/vnPay', passport.authenticate('jwt', { session: false }), vnPayRouter);
 
-app.use('/employees', passport.authenticate('jwt', { session: false }), employeesRouter);
+app.use('/employees', employeesRouter);
 app.use('/customers', customerRouter);
 app.use('/suppliers', supplierRouter);
 app.use('/categories', categoryRouter);
 app.use('/authEmployee', authEmployeeRouter);
+app.use('/authCustomers', authCustomersRouter);
 app.use('/products', productRouter);
 app.use('/orders', orderRouter);
 app.use('/media', mediaRouter);
 app.use('/keySearch', keySearchRouter);
 app.use('/questions', questionsRouter);
-// app.use('/vnPay', passport.authenticate('jwt', { session: false }), vnPayRouter);
 app.use('/vnPay', vnPayRouter);
+// app.use('/vnPay', vnPayRouter);
 // app.use('/mediaS3', mediaS3Router);
 
 // catch 404 and forward to error handler

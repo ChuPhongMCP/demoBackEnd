@@ -2,7 +2,7 @@ const JWT = require('jsonwebtoken');
 
 const jwtSetting = require('../../constants/jwtSetting');
 const { generateToken, generateRefreshToken } = require('../../helper/jwtHelper');
-const { Employee } = require('../../models');
+const { Customer } = require('../../models');
 
 module.exports = {
   login: async (req, res, next) => {
@@ -57,12 +57,12 @@ module.exports = {
           else {
             const { id } = data;
 
-            const employee = await Employee.findOne({
+            const customer = await Customer.findOne({
               _id: id,
               isDeleted: false,
             }).select('-password').lean();
 
-            if (employee) {
+            if (customer) {
               const {
                 _id,
                 firstName,
@@ -72,7 +72,7 @@ module.exports = {
                 email,
                 birthday,
                 createdAt,
-              } = employee;
+              } = customer;
               const token = generateToken({
                 _id,
                 firstName,

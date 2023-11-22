@@ -28,15 +28,17 @@ const createSchema = yup.object({
         phoneNumber: yup.string()
             .required("phoneNumber không được bỏ trống")
             .max(50, "Số điện thoại không được vượt quá 50 ký tự")
-            .test('phoneNumber type', '${value} không phải số điện thoại hợp lệ', (value) => {
-                const phoneRegex = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
+            // .test('phoneNumber type', '${value} không phải số điện thoại hợp lệ', (value) => {
+            //     if (!value) return true;
+                
+            //     const phoneRegex = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
 
-                return phoneRegex.test(value);
-            })
+            //     return phoneRegex.test(value);
+            // })
         ,
 
         address: yup.string()
-            .required("Địa chỉ không được bỏ trống")
+            // .required("Địa chỉ không được bỏ trống")
             .max(500, 'Địa chỉ không được vượt quá 500 ký tự'),
 
         birthday: yup.date(),

@@ -271,7 +271,7 @@ module.exports = {
     try {
       const data = req.body;
 
-      console.log('««««« req.body »»»»»', req.body);
+      // console.log('««««« req.body »»»»»', req.body);
 
       console.log('««««« data »»»»»', data);
 

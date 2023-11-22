@@ -4,6 +4,8 @@ const jwtSettings = require('../constants/jwtSetting');
 
 const generateToken = (user) => {
   const expiresIn = '1h';
+  // const expiresIn = '10s';
+
   const algorithm = 'HS256';
 
   return JWT.sign(
@@ -23,6 +25,7 @@ const generateToken = (user) => {
 
 const generateRefreshToken = (id) => {
   const expiresIn = '30d';
+  // const expiresIn = '15s';
 
   return JWT.sign({ id }, jwtSettings.SECRET, { expiresIn })
 };

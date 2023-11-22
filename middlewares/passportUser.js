@@ -1,19 +1,19 @@
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
-const BasicStrategy = require('passport-http').BasicStrategy;
+// const BasicStrategy = require('passport-http').BasicStrategy;
 
 const jwtSettings = require('../constants/jwtSetting');
-const { Employee } = require('../models');
+const { Customer } = require('../models');
 
-const passportVerifyToken = new JwtStrategy(
+const passportVerifyTokenUser = new JwtStrategy(
   {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('Authorization'),
     secretOrKey: jwtSettings.SECRET,
   },
   async (payload, done) => {
     try {
-      const user = await Employee.findOne({
+      const user = await Customer.findOne({
         _id: payload._id,
         isDeleted: false,
       }).select('-password');
@@ -27,13 +27,13 @@ const passportVerifyToken = new JwtStrategy(
   },
 );
 
-const passportVerifyAccount = new LocalStrategy(
+const passportVerifyAccountUser = new LocalStrategy(
   {
     usernameField: 'email',
   },
   async (email, password, done) => {
     try {
-      const user = await Employee.findOne({
+      const user = await Customer.findOne({
         isDeleted: false,
         email,
       });
@@ -70,7 +70,7 @@ const passportVerifyAccount = new LocalStrategy(
 // });
 
 module.exports = {
-  passportVerifyToken,
-  passportVerifyAccount,
+  passportVerifyTokenUser,
+  passportVerifyAccountUser,
   // passportConfigBasic,
 };

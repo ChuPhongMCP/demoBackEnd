@@ -37,9 +37,32 @@ module.exports = {
         }
     },
 
+    search: async (req, res, next) => {
+        try {
+            const { email } = req.query;
+
+            const conditionFind = {
+                email,
+            }
+
+            const results = await Customer.findOne(conditionFind).select('-password');
+
+            if (results) {
+                return res.send(200, { statusCode: 200, message: "success" })
+            } else {
+                return res.send(404, { statusCode: 404, message: "not found" })
+            }
+        } catch (error) {
+            console.log('««««« error »»»»»', error);
+            return res.status(500).json({ message: "Internal server error", errors: error.message });
+        }
+    },
+
     create: async (req, res, next) => {
         try {
             const data = req.body;
+
+            console.log('««««« data »»»»»', data);
 
             const { email, phoneNumber } = data;
 
@@ -53,7 +76,7 @@ module.exports = {
             if (doGetPhoneExits) errors.push(' Số điện thoại đã tồn tại');
 
             if (errors.length > 0) {
-                return res.status(200).json({
+                return res.status(400).json({
                     message: `Thêm khách hàng không thành công, ${errors}`,
                 });
             }
@@ -64,10 +87,41 @@ module.exports = {
 
             result.password = undefined;
 
-            return res.send(200, { message: 'Thêm khách hàng thành công', payload: result });
+            return res.send(200, { statusCode: 200, message: 'success', payload: result });
         } catch (err) {
             console.log('««««« err »»»»»', err);
-            return res.status(500).json({ message: "Thêm khách hàng thất bại", errors: err.message });
+            return res.status(500).json({ message: "Internal server error", errors: err.message });
+        }
+    },
+
+    createGoogle: async (req, res, next) => {
+        try {
+            const data = req.body;
+
+            const { email } = data;
+
+            const getEmailExits = await Customer.findOne({ email });
+
+            const errors = [];
+
+            if (getEmailExits) errors.push(' Email already exists');
+
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    message: `Adding customers failed, ${errors}`,
+                });
+            }
+
+            const newItem = new Customer(data);
+
+            let result = await newItem.save();
+
+            result.password = undefined;
+
+            return res.send(200, { statusCode: 200, message: 'success', payload: result });
+        } catch (err) {
+            console.log('««««« err »»»»»', err);
+            return res.status(500).json({ message: "Internal server error", errors: err.message });
         }
     },
 
