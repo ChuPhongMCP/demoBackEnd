@@ -1,4 +1,4 @@
-const { Order, Customer, Employee, Product } = require('../../models');
+const { Order, Customer, Employee, Product, FlashSale } = require('../../models');
 const { fuzzySearch, asyncForEach } = require('../../helper');
 
 module.exports = {
@@ -372,6 +372,20 @@ module.exports = {
           { _id: item.productId },
           { $inc: { stock: -item.quantity } }
         );
+
+        const findProduct = await Product.findOne(
+          {
+            _id: item.productId,
+            isFlashSale: true,
+          }
+        )
+
+        if (findProduct) {
+          await FlashSale.findOneAndUpdate(
+            { productId: item.productId },
+            { $inc: { stock: -item.quantity } }
+          );
+        }
       });
 
       const result = await Order.findOne({ _id: responsive._id })

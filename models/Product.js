@@ -25,6 +25,11 @@ const productSchema = Schema(
       default: false,
       required: true,
     },
+    isFlashSale: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     versionKey: false,

@@ -152,7 +152,7 @@ module.exports = {
               name: file.Key,
               location: `${url}/${file.Key}`,
               size: file.size,
-              employeeId: req.user._id,
+              // employeeId: req.user._id,
               objectId: objid,
               type: TYPE.SMALL_IMG,
             });
@@ -169,7 +169,7 @@ module.exports = {
               name: fileName,
               location: url,
               size: file.size,
-              employeeId: req.user._id,
+              // employeeId: req.user._id,
               objectId: objid,
               type: TYPE.SMALL_IMG,
             });

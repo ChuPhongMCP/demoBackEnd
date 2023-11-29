@@ -1,4 +1,4 @@
-const { Customer } = require('../../models');
+const { Customer, Cart } = require('../../models');
 const { hashPassword } = require('../../helper');
 
 module.exports = {
@@ -87,6 +87,12 @@ module.exports = {
 
             result.password = undefined;
 
+            const customerId = result._id
+
+            const newCart = new Cart({customerId});
+
+            await newCart.save();
+
             return res.send(200, { statusCode: 200, message: 'success', payload: result });
         } catch (err) {
             console.log('««««« err »»»»»', err);
@@ -117,6 +123,12 @@ module.exports = {
             let result = await newItem.save();
 
             result.password = undefined;
+
+            const customerId = result._id
+
+            const newCart = new Cart({customerId});
+
+            await newCart.save();
 
             return res.send(200, { statusCode: 200, message: 'success', payload: result });
         } catch (err) {

@@ -7,7 +7,7 @@ const mediaSchema = new Schema(
     name: { type: String, required: true },
     size: { type: Number, require: true },
     location: { type: String, required: true },
-    employeeId: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
+    // employeeId: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
     objectId: { type: Schema.Types.ObjectId, required: true },
     type: { type: String, required: true, enum: { values: ['smallImg', 'largeImg'], } }
   },

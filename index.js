@@ -17,12 +17,14 @@ const categoryRouter = require('./routes/category/router');
 const authEmployeeRouter = require('./routes/authEmployee/router');
 const authCustomersRouter = require('./routes/authCustomer/router');
 const productRouter = require('./routes/product/router');
+const flashSaleRouter = require('./routes/flashSale/router');
 const orderRouter = require('./routes/order/router');
 const mediaRouter = require('./routes/upload');
 const keySearchRouter = require('./routes/keySearch/router');
 const mediaS3Router = require('./routes/uploadUsingCFR2/router');
 const questionsRouter = require('./routes/questions/router');
 const vnPayRouter = require('./routes/vnPay/router');
+const cartRouter = require('./routes/cart/router');
 
 const {
   passportVerifyTokenAdmin,
@@ -70,6 +72,7 @@ app.use('/', indexRouter);
 // app.use('/categories', passport.authenticate('jwt', { session: false }), categoryRouter);
 // app.use('/authEmployee', authEmployeeRouter);
 // app.use('/products', passport.authenticate('jwt', { session: false }), productRouter);
+// app.use('/flashSale', flashSaleRouter);
 // app.use('/media', passport.authenticate('jwt', { session: false }), mediaRouter);
 // app.use('/keySearch', passport.authenticate('jwt', { session: false }), keySearchRouter);
 app.use('/mediaS3', mediaS3Router);
@@ -82,11 +85,13 @@ app.use('/categories', categoryRouter);
 app.use('/authEmployee', authEmployeeRouter);
 app.use('/authCustomers', authCustomersRouter);
 app.use('/products', productRouter);
+app.use('/flashSale', flashSaleRouter);
 app.use('/orders', orderRouter);
 app.use('/media', mediaRouter);
 app.use('/keySearch', keySearchRouter);
 app.use('/questions', questionsRouter);
 app.use('/vnPay', vnPayRouter);
+app.use('/cart', passport.authenticate('jwtUser', { session: false }), cartRouter);
 // app.use('/vnPay', vnPayRouter);
 // app.use('/mediaS3', mediaS3Router);
 
