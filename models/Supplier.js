@@ -46,6 +46,7 @@ const supplierSchema = new Schema(
             required: true,
         },
     },
+
     {
         versionKey: false,
         timestamps: true,

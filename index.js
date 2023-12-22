@@ -16,15 +16,17 @@ const supplierRouter = require('./routes/supplier/router');
 const categoryRouter = require('./routes/category/router');
 const authEmployeeRouter = require('./routes/authEmployee/router');
 const authCustomersRouter = require('./routes/authCustomer/router');
-const productRouter = require('./routes/product/router');
+const productRouter = require('./routes/product-admin/router');
 const flashSaleRouter = require('./routes/flashSale/router');
-const orderRouter = require('./routes/order/router');
+const orderRouter = require('./routes/orderAdmin/router');
 const mediaRouter = require('./routes/upload');
 const keySearchRouter = require('./routes/keySearch/router');
 const mediaS3Router = require('./routes/uploadUsingCFR2/router');
-const questionsRouter = require('./routes/questions/router');
+const questionsRouter = require('./routes/questionsAdmin/router');
 const vnPayRouter = require('./routes/vnPay/router');
 const cartRouter = require('./routes/cart/router');
+const commentRouter = require('./routes/comment/router');
+const replyRouter = require('./routes/reply/router');
 
 const {
   passportVerifyTokenAdmin,
@@ -91,6 +93,8 @@ app.use('/media', mediaRouter);
 app.use('/keySearch', keySearchRouter);
 app.use('/questions', questionsRouter);
 app.use('/vnPay', vnPayRouter);
+app.use('/comments', commentRouter);
+app.use('/replys', replyRouter);
 app.use('/cart', passport.authenticate('jwtUser', { session: false }), cartRouter);
 // app.use('/vnPay', vnPayRouter);
 // app.use('/mediaS3', mediaS3Router);

@@ -8,6 +8,8 @@ const Order = require('./Order');
 const Media = require('./Media');
 const KeySearch = require('./KeySearch');
 const Cart = require('./Cart');
+const Comment = require('./Comment');
+const Reply = require('./Reply');
 
 module.exports = {
     Employee,
@@ -20,4 +22,6 @@ module.exports = {
     Media,
     KeySearch,
     Cart,
+    Comment,
+    Reply,
 };
