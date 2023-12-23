@@ -87,51 +87,71 @@ module.exports = {
 
   search: async (req, res, next) => {
     try {
-      const { id, name, categoryId, priceStart, priceEnd, supplierId } = req.query;
-      const conditionFind = { isDeleted: false };
+      const { name } = req.query;
 
-      if (id) {
-        conditionFind._id = id;
-      };
+      const conditionFind = { isDeleted: false };
 
       if (name) conditionFind.name = fuzzySearch(name);
 
-      if (categoryId) {
-        conditionFind.categoryId = categoryId;
-      };
-
-      if (supplierId) {
-        conditionFind.supplierId = supplierId;
-      };
-
-      if (priceStart && priceEnd) { // 20 - 50
-        const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
-        const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
-        conditionFind.$expr = { $and: [compareStart, compareEnd] };
-      } else if (priceStart) {
-        conditionFind.price = { $gte: parseFloat(priceStart) };
-      } else if (priceEnd) {
-        conditionFind.price = { $lte: parseFloat(priceEnd) };
-      }
-
-      console.log('««««« conditionFind »»»»»', conditionFind);
-
       const result = await Product.find(conditionFind)
-        .populate('category')
-        .populate('supplier');
 
-      res.send(200, {
-        message: "Tìm kiếm thành công",
+      return res.send(200, {
+        message: "Success",
         payload: result,
       });
-    } catch (err) {
+    } catch (error) {
       console.log('««««« err »»»»»', err);
-      return res.send(404, {
-        message: "Không tìm thấy",
-        errors: err.message,
-      })
+      return res.status(500).json({ message: "Internal Server Error", errors: err.message });
     }
   },
+
+  // search: async (req, res, next) => {
+  //   try {
+  //     const { id, name, categoryId, priceStart, priceEnd, supplierId } = req.query;
+  //     const conditionFind = { isDeleted: false };
+
+  //     if (id) {
+  //       conditionFind._id = id;
+  //     };
+
+  //     if (name) conditionFind.name = fuzzySearch(name);
+
+  //     if (categoryId) {
+  //       conditionFind.categoryId = categoryId;
+  //     };
+
+  //     if (supplierId) {
+  //       conditionFind.supplierId = supplierId;
+  //     };
+
+  //     if (priceStart && priceEnd) { // 20 - 50
+  //       const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
+  //       const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
+  //       conditionFind.$expr = { $and: [compareStart, compareEnd] };
+  //     } else if (priceStart) {
+  //       conditionFind.price = { $gte: parseFloat(priceStart) };
+  //     } else if (priceEnd) {
+  //       conditionFind.price = { $lte: parseFloat(priceEnd) };
+  //     }
+
+  //     console.log('««««« conditionFind »»»»»', conditionFind);
+
+  //     const result = await Product.find(conditionFind)
+  //       .populate('category')
+  //       .populate('supplier');
+
+  //     res.send(200, {
+  //       message: "Tìm kiếm thành công",
+  //       payload: result,
+  //     });
+  //   } catch (err) {
+  //     console.log('««««« err »»»»»', err);
+  //     return res.send(404, {
+  //       message: "Không tìm thấy",
+  //       errors: err.message,
+  //     })
+  //   }
+  // },
 
   largeSearch: async (req, res, next) => {
     try {
