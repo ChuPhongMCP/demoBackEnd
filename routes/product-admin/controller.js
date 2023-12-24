@@ -6,9 +6,12 @@ module.exports = {
   getAll: async (req, res, next) => { // NOTE
 
     try {
-      const { page, pageSize } = req.query;
+      const { page, pageSize, sort } = req.query;
 
       const conditionFind = { isDeleted: false };
+
+      const converSort = +sort;
+
       const total = await Product.countDocuments(conditionFind);
 
       const limit = pageSize || total;
@@ -21,10 +24,9 @@ module.exports = {
       //page = 4, pageSize = 2, limit = 2, skip = 6
 
       let results = await Product.find(conditionFind)
-        .populate('category')
-        .populate('supplier')
         .skip(skip)
         .limit(limit)
+        .sort({ createDate: converSort })
       // .lean();
 
       const numOfShow = results.length;
