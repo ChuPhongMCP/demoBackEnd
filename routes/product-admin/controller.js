@@ -87,20 +87,32 @@ module.exports = {
 
   search: async (req, res, next) => {
     try {
-      const { name } = req.query;
+      const { name, page, pageSize, sort } = req.query;
 
       const conditionFind = { isDeleted: false };
 
+      const converSort = +sort;
+
+      const total = await Product.countDocuments(conditionFind);
+
+      const limit = pageSize || total;
+
+      const skip = limit * page - limit || 0;
+
       if (name) conditionFind.name = fuzzySearch(name);
 
-      const result = await Product.find(conditionFind)
+      console.log('««««« conditionFind »»»»»', conditionFind);
 
-      return res.send(200, {
-        message: "Success",
-        payload: result,
-      });
+      const results = await Product.find(conditionFind)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createDate: converSort })
+
+      const numOfShow = results.length;
+
+      return res.send(200, { total, numOfShow, page: parseInt(page || 1), pageSize: parseInt(pageSize || limit), payload: results, });
     } catch (error) {
-      console.log('««««« err »»»»»', err);
+      console.log('««««« error »»»»»', error);
       return res.status(500).json({ message: "Internal Server Error", errors: err.message });
     }
   },
