@@ -28,52 +28,13 @@ const validationSchema = yup.object().shape({
 
 const validationQuerySchema = yup.object().shape({
   query: yup.object({
-    categoryId: yup.string().test('Validate ObjectID', '${path} is not valid ObjectID', (value) => {
-      if (!value) return true;
-      return ObjectId.isValid(value);
-    }),
-
-    priceStart: yup.number().test('Giá không hợp lệ', (value, context) => {
-      if (!value) return true; // Không điền giá kết thúc
-
-      if (context.parent.priceEnd) {
-        return value < context.parent.priceEnd // Giá kết thúc phải lớn hơn giá bắt đầu (nếu có)
-      };
-
-      return value > 0;
-    }),
-
-    priceEnd: yup.number().test('Giá không hợp lệ', (value, context) => {
-      if (!value) return true; // Không điền giá kết thúc
-
-      if (context.parent.priceStart) {
-        return value > context.parent.priceStart; // Giá kết thúc phải lớn hơn giá bắt đầu (nếu có)
-      }
-
-      return value > 0;
-    }),
+   
     page: yup.number().min(1),
 
     pageSize: yup.number().min(2),
 
-    supplierId: yup.string().test('Validate ObjectID', '${path} is not valid ObjectID', (value) => {
-      if (!value) return true;
-      return ObjectId.isValid(value);
-    }),
-
     name: yup.string(),
 
-    stockStart: yup.number().min(0),
-
-    stockEnd: yup.number(),
-
-    discountStart: yup.number().min(0),
-
-    discountEnd: yup.number().max(75),
-
-    // skip: yup.number(),
-
-    // limit: yup.number(),
   }),
 });
 

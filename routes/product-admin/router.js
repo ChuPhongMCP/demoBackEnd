@@ -3,7 +3,7 @@ var router = express.Router();
 
 const { validateSchema } = require('../../helper')
 
-const { getDetail, getAll, searchForOrder, search, largeSearch, create, update, softDelete, restore } = require('./controller');
+const { getDetail, getAll, search, create, update, softDelete, restore } = require('./controller');
 const { validationSchema, validationQuerySchema, getDetailSchema } = require('./validation');
 
 router.route('/')
@@ -11,9 +11,6 @@ router.route('/')
   .post(validateSchema(validationSchema), create)
 
 router.get('/search', validateSchema(validationQuerySchema), search);
-router.post('/search', validateSchema(validationQuerySchema), largeSearch);
-
-router.get('/search-for-order', searchForOrder);
 
 router.route('/:id')
   .get(validateSchema(getDetailSchema), getDetail)

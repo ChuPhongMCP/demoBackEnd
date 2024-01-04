@@ -40,53 +40,6 @@ module.exports = {
     }
   },
 
-  searchForOrder: async (req, res, next) => {
-    try {
-      const { query } = req.query;
-      let conditionFind = { isDeleted: false };
-
-      if (query) {
-        const ObjectId = require('mongoose').Types.ObjectId;
-
-        if (ObjectId.isValid(query)) {
-          conditionFind = {
-            ...conditionFind,
-            _id: query,
-          }
-        } else {
-          conditionFind = {
-            ...conditionFind,
-            name: fuzzySearch(query),
-          }
-        }
-
-        // const objId = new ObjectId(!ObjectId.isValid(query) ? "123456789012" : query);
-
-        // conditionFind = {
-        //   ...conditionFind,
-        //   $or: [{ _id: objId }, { name: fuzzySearch(query) }],
-        // }
-      }
-
-      console.log('««««« conditionFind »»»»»', conditionFind);
-
-      const result = await Product.find(conditionFind)
-        .populate('category')
-        .populate('supplier');
-
-      res.send(200, {
-        message: "Tìm kiếm thành công",
-        payload: result,
-      });
-    } catch (err) {
-      console.log('««««« err »»»»»', err);
-      return res.send(404, {
-        message: "Không tìm thấy",
-        errors: err.message,
-      })
-    }
-  },
-
   search: async (req, res, next) => {
     try {
       const { name, page, pageSize, sort } = req.query;
@@ -116,98 +69,6 @@ module.exports = {
     } catch (error) {
       console.log('««««« error »»»»»', error);
       return res.status(500).json({ message: "Internal Server Error", errors: err.message });
-    }
-  },
-
-  // search: async (req, res, next) => {
-  //   try {
-  //     const { id, name, categoryId, priceStart, priceEnd, supplierId } = req.query;
-  //     const conditionFind = { isDeleted: false };
-
-  //     if (id) {
-  //       conditionFind._id = id;
-  //     };
-
-  //     if (name) conditionFind.name = fuzzySearch(name);
-
-  //     if (categoryId) {
-  //       conditionFind.categoryId = categoryId;
-  //     };
-
-  //     if (supplierId) {
-  //       conditionFind.supplierId = supplierId;
-  //     };
-
-  //     if (priceStart && priceEnd) { // 20 - 50
-  //       const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
-  //       const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
-  //       conditionFind.$expr = { $and: [compareStart, compareEnd] };
-  //     } else if (priceStart) {
-  //       conditionFind.price = { $gte: parseFloat(priceStart) };
-  //     } else if (priceEnd) {
-  //       conditionFind.price = { $lte: parseFloat(priceEnd) };
-  //     }
-
-  //     console.log('««««« conditionFind »»»»»', conditionFind);
-
-  //     const result = await Product.find(conditionFind)
-  //       .populate('category')
-  //       .populate('supplier');
-
-  //     res.send(200, {
-  //       message: "Tìm kiếm thành công",
-  //       payload: result,
-  //     });
-  //   } catch (err) {
-  //     console.log('««««« err »»»»»', err);
-  //     return res.send(404, {
-  //       message: "Không tìm thấy",
-  //       errors: err.message,
-  //     })
-  //   }
-  // },
-
-  largeSearch: async (req, res, next) => {
-    try {
-      const { name, categoryId, priceStart, priceEnd, supplierId } = req.body;
-      const conditionFind = { isDeleted: false };
-
-      if (name) conditionFind.name = fuzzySearch(name);
-
-      if (categoryId) {
-        conditionFind.categoryId = categoryId;
-      };
-
-      if (supplierId) {
-        conditionFind.supplierId = supplierId;
-      };
-
-      if (priceStart && priceEnd) { // 20 - 50
-        const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
-        const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
-        conditionFind.$expr = { $and: [compareStart, compareEnd] };
-      } else if (priceStart) {
-        conditionFind.price = { $gte: parseFloat(priceStart) };
-      } else if (priceEnd) {
-        conditionFind.price = { $lte: parseFloat(priceEnd) };
-      }
-
-      console.log('««««« conditionFind »»»»»', conditionFind);
-
-      const result = await Product.find(conditionFind)
-        .populate('category')
-        .populate('supplier');
-
-      res.send(200, {
-        message: "Tìm kiếm thành công",
-        payload: result,
-      });
-    } catch (err) {
-      console.log('««««« err »»»»»', err);
-      return res.send(404, {
-        message: "Không tìm thấy",
-        errors: err.message,
-      })
     }
   },
 
@@ -283,33 +144,6 @@ module.exports = {
     try {
       const { id } = req.params;
       const dataUpdate = req.body;
-
-      // // Check if the product exists and is not deleted
-      // const product = await Product.findOne({ _id: id, isDeleted: false });
-
-      // console.log('««««« product »»»»»', product);
-
-      // if (!product) {
-      //   return res.status(404).json({ message: `Không tìm thấy sản phẩm nào có ID: ${id}` });
-      // }
-
-      // // Check if the supplier exists and is not deleted
-      // if (product.supplierId !== dataUpdate.supplierId) {
-      //   const supplier = await Supplier.findOne({ _id: dataUpdate.supplierId, isDeleted: false });
-
-      //   if (!supplier) {
-      //     return res.status(400).json({ message: `Supplier ${dataUpdate.supplierId} không khả dụng` });
-      //   }
-      // }
-
-      // // Check if the category exists and is not deleted
-      // if (product.categoryId !== dataUpdate.categoryId) {
-      //   const category = await Category.findOne({ _id: dataUpdate.categoryId, isDeleted: false });
-
-      //   if (!category) {
-      //     return res.status(400).json({ message: `Category ${dataUpdate.categoryId} không khả dụng` });
-      //   }
-      // }
 
       const findSupplier = Supplier.findOne({ _id: dataUpdate.supplierId, isDeleted: false });
       const findCategory = Category.findOne({ _id: dataUpdate.categoryId, isDeleted: false });
