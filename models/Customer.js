@@ -1,41 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
-const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 const bcrypt = require('bcryptjs');
 
 const customerSchema = new Schema(
     {
-        firstName: {
+        fullName: {
             type: String,
             required: [true, 'Tên không được bỏ trống'],
-            maxLength: [50, 'Tên không được vượt quá 50 ký tự'],
-        },
-        lastName: {
-            type: String,
-            required: [true, 'Họ không được bỏ trống'],
-            maxLength: [50, 'Họ không được vượt quá 50 ký tự'],
-        },
-        phoneNumber: {
-            type: String,
-            required: [true, 'Số điện thoại không được bỏ trống'],
-            maxLength: [50, 'Số điện thoại không được vượt quá 50 ký tự'],
-            // validate: {
-                // validator: function (value) {
-                    // if(!value) return true;
-
-                    // const phoneRegex = /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/;
-                    // return phoneRegex.test(value);
-                // },
-                // message: `{VALUE} không phải là số điện thoại hợp lệ!`,
-                // message: (props) => `{props.value} is not a valid email!`,
-            // },
-            unique: [true, 'Số điện thoại không được trùng'],
-        },
-        address: {
-            type: String,
-            // required: [true, 'Địa chỉ không được bỏ trống'],
-            maxLength: [500, 'Địa chỉ không được vượt quá 500 ký tự'],
-            // unique: [true, 'Địa chỉ không được trùng'],
+            maxLength: [100, 'Tên không được vượt quá 100 ký tự'],
         },
         email: {
             type: String,
@@ -48,10 +20,9 @@ const customerSchema = new Schema(
                 // message: (props) => `{props.value} is not a valid email!`,
             },
             required: [true, 'Email không được bỏ trống'],
-            maxLength: [50, 'Email không được vượt quá 50 ký tự'],
+            maxLength: [100, 'Email không được vượt quá 100 ký tự'],
             unique: [true, 'Email không được trùng'],
         },
-        birthday: { type: Date },
         isDeleted: {
             type: Boolean,
             default: false,
@@ -70,16 +41,10 @@ const customerSchema = new Schema(
     },
 );
 
-// Virtuals
-customerSchema.virtual('fullName').get(function () {
-    return this.firstName + ' ' + this.lastName;
-});
-
 // Config
 customerSchema.set('toJSON', { virtuals: true });
 customerSchema.set('toObject', { virtuals: true });
 //
-customerSchema.plugin(mongooseLeanVirtuals);
 
 customerSchema.pre('save', async function (next) {
     try {

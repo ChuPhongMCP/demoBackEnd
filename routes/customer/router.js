@@ -21,7 +21,7 @@ router.route('/search')
     .get(search)
 
 router.route('/create-google')
-    .post(createGoogle)
+    .post(validateSchema(createSchema), createGoogle)
 
 router.route('/')
     .get(getAll)

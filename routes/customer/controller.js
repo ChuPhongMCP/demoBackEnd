@@ -64,16 +64,14 @@ module.exports = {
 
             console.log('««««« data »»»»»', data);
 
-            const { email, phoneNumber } = data;
+            const { email } = data;
 
-            const getEmailExits = Customer.findOne({ email });
-            const getPhoneExits = Customer.findOne({ phoneNumber });
+            const getEmailExits = await Customer.findOne({ email });
 
-            const [doGetEmailExits, doGetPhoneExits] = await Promise.all([getEmailExits, getPhoneExits]);
 
             const errors = [];
-            if (doGetEmailExits) errors.push(' Email đã tồn tại');
-            if (doGetPhoneExits) errors.push(' Số điện thoại đã tồn tại');
+            
+            if (getEmailExits) errors.push(' Email đã tồn tại');
 
             if (errors.length > 0) {
                 return res.status(400).json({
