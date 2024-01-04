@@ -73,5 +73,8 @@ const productSchema = Schema(
   },
 );
 
+productSchema.set('toJSON', { virtuals: true });
+productSchema.set('toObject', { virtuals: true });
+
 const Product = model('products', productSchema);
 module.exports = Product;

@@ -68,7 +68,7 @@ module.exports = {
       return res.send(200, { total, numOfShow, page: parseInt(page || 1), pageSize: parseInt(pageSize || limit), payload: results, });
     } catch (error) {
       console.log('««««« error »»»»»', error);
-      return res.status(500).json({ message: "Internal Server Error", errors: err.message });
+      return res.status(500).json({ message: "Internal Server Error", errors: error.message });
     }
   },
 
@@ -80,8 +80,6 @@ module.exports = {
         _id: id,
         isDeleted: false,
       })
-        .populate('category')
-        .populate('supplier');
 
       if (result) {
         return res.send(200, { message: "Tìm kiếm thành công", payload: result });
