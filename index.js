@@ -15,6 +15,7 @@ const authCustomersRouter = require('./routes/authCustomer/router');
 const productRouter = require('./routes/product-admin/router');
 const commentRouter = require('./routes/comment/router');
 const replyRouter = require('./routes/reply/router');
+const trafficRouter = require('./routes/traffic/router');
 
 const {
   passportVerifyTokenUser,
@@ -52,6 +53,7 @@ app.use('/authCustomers', authCustomersRouter);
 app.use('/products', productRouter);
 app.use('/comments', commentRouter);
 app.use('/replys', replyRouter);
+app.use('/traffics', trafficRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

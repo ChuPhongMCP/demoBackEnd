@@ -4,6 +4,7 @@ const Category = require('./Category');
 const Product = require('./Product');
 const Comment = require('./Comment');
 const Reply = require('./Reply');
+const Traffic = require('./Traffic');
 
 module.exports = {
     Customer,
@@ -12,4 +13,5 @@ module.exports = {
     Product,
     Comment,
     Reply,
+    Traffic,
 };

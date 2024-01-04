@@ -76,6 +76,12 @@ module.exports = {
     try {
       const { id } = req.params;
 
+      await Product.findOneAndUpdate(
+        { _id: id },
+        { $inc: { view: 1 } },
+        { new: true }
+      );
+
       let result = await Product.findOne({
         _id: id,
         isDeleted: false,
