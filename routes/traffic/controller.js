@@ -6,8 +6,6 @@ module.exports = {
     try {
       const data = req.body;
 
-      console.log('««««« data »»»»»', data);
-
       const newItem = new Traffic(data);
 
       const result = await newItem.save();

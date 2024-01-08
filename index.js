@@ -4,14 +4,16 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-const multer = require('multer');
+// const multer = require('multer');
 const { default: mongoose } = require('mongoose');
 const passport = require('passport');
 require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 const customerRouter = require('./routes/customer/router');
+const employeeRouter = require('./routes/employee/router');
 const authCustomersRouter = require('./routes/authCustomer/router');
+const authEmployeesRouter = require('./routes/authEmployee/router');
 const productRouter = require('./routes/product-admin/router');
 const commentRouter = require('./routes/comment/router');
 const replyRouter = require('./routes/reply/router');
@@ -22,6 +24,12 @@ const {
   passportVerifyAccountUser,
   // passportConfigBasic,
 } = require('./middlewares/passportUser');
+
+const {
+  passportVerifyTokenAdmin,
+  passportVerifyAccountAdmin,
+  // passportConfigBasic,
+} = require('./middlewares/passportAdmin');
 
 const app = express();
 
@@ -46,10 +54,16 @@ mongoose.connect(`${process.env.DATABASE_URL}${process.env.DATABASE_NAME}`);
 passport.use('jwtUser', passportVerifyTokenUser);
 passport.use('localUser', passportVerifyAccountUser);
 
+passport.use('jwtAdmin', passportVerifyTokenAdmin);
+passport.use('localAdmin', passportVerifyAccountAdmin);
+
 app.use('/', indexRouter);
 
 app.use('/customers', customerRouter);
+app.use('/employees', employeeRouter);
 app.use('/authCustomers', authCustomersRouter);
+app.use('/authEmployees', authEmployeesRouter);
+// app.use('/products', passport.authenticate('jwtAdmin', { session: false }), productRouter);
 app.use('/products', productRouter);
 app.use('/comments', commentRouter);
 app.use('/replys', replyRouter);

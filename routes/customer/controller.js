@@ -62,8 +62,6 @@ module.exports = {
         try {
             const data = req.body;
 
-            console.log('««««« data »»»»»', data);
-
             const { email } = data;
 
             const getEmailExits = await Customer.findOne({ email });
@@ -84,12 +82,6 @@ module.exports = {
             let result = await newItem.save();
 
             result.password = undefined;
-
-            const customerId = result._id
-
-            const newCart = new Cart({customerId});
-
-            await newCart.save();
 
             return res.send(200, { statusCode: 200, message: 'success', payload: result });
         } catch (err) {
@@ -121,12 +113,6 @@ module.exports = {
             let result = await newItem.save();
 
             result.password = undefined;
-
-            const customerId = result._id
-
-            const newCart = new Cart({customerId});
-
-            await newCart.save();
 
             return res.send(200, { statusCode: 200, message: 'success', payload: result });
         } catch (err) {

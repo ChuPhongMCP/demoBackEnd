@@ -1,6 +1,19 @@
 const { Product, Category, Supplier } = require('../../models');
 const { fuzzySearch } = require('../../helper');
-// const ObjectId = require('mongodb').ObjectId;
+const multer = require('multer');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const moment = require('moment-timezone');
+
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+});
+
+function generateUniqueFileName(originalname) {
+  const timestamp = Date.now();
+  const randomChars = Math.random().toString(36).substring(2, 15);
+  return `${originalname.split(".")[0]}-${timestamp}-${randomChars}`;
+}
 
 module.exports = {
   getAll: async (req, res, next) => { // NOTE
@@ -56,8 +69,6 @@ module.exports = {
 
       if (name) conditionFind.name = fuzzySearch(name);
 
-      console.log('««««« conditionFind »»»»»', conditionFind);
-
       const results = await Product.find(conditionFind)
         .skip(skip)
         .limit(limit)
@@ -94,46 +105,159 @@ module.exports = {
     }
   },
 
+  upImageHeader: async (req, res, next) => {
+    upload.single('imageHeader')(req, res, async (err) => {
+      try {
+        const fileName = generateUniqueFileName(req.file.originalname)
+
+        const S3 = new S3Client({
+          region: 'auto',
+          endpoint: process.env.R2_ENDPOINT,
+          credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+          },
+        });
+
+        await S3.send(
+          new PutObjectCommand({
+            Body: req.file.buffer,
+            Bucket: 'demobackend',
+            Key: fileName,
+            ContentType: req.file.mimetype,
+          })
+        );
+
+        const url = `${process.env.R2_URL}/${fileName}`
+
+        return res.send(200, {
+          message: "success",
+          payload: url,
+        });
+      } catch (error) {
+        console.log('««««« error »»»»»', error);
+        return res.send(500, {
+          message: "Internal server error",
+          error,
+        });
+      }
+    })
+  },
+
+  upImageHD: async (req, res, next) => {
+    upload.single('imageHD')(req, res, async (err) => {
+      try {
+        const fileName = generateUniqueFileName(req.file.originalname)
+
+        const S3 = new S3Client({
+          region: 'auto',
+          endpoint: process.env.R2_ENDPOINT,
+          credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+          },
+        });
+
+        await S3.send(
+          new PutObjectCommand({
+            Body: req.file.buffer,
+            Bucket: 'demobackend',
+            Key: fileName,
+            ContentType: req.file.mimetype,
+          })
+        );
+
+        const url = `${process.env.R2_URL}/${fileName}`
+
+        return res.send(200, {
+          message: "success",
+          payload: url,
+        });
+      } catch (error) {
+        console.log('««««« error »»»»»', error);
+        return res.send(500, {
+          message: "Internal server error",
+          error,
+        });
+      }
+    })
+  },
+
+  upImageList: async (req, res, next) => {
+    upload.array('imageList', 4)(req, res, async (err) => {
+      try {
+        let listUrl = [];
+
+        const S3 = new S3Client({
+          region: 'auto',
+          endpoint: process.env.R2_ENDPOINT,
+          credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+          },
+        });
+
+        const listFiles = req.files.reduce((prev, file) => {
+          prev.push({
+            Body: file.buffer,
+            Bucket: 'demobackend',
+            Key: generateUniqueFileName(file.originalname),
+            ContentType: file.mimetype,
+          });
+
+          return prev;
+        }, []);
+
+        await Promise.all(listFiles.map(async (file) => {
+          try {
+            const params = {
+              Body: file.Body,
+              Bucket: file.Bucket,
+              Key: file.Key,
+              ContentType: file.ContentType,
+            };
+
+            await S3.send(new PutObjectCommand(params));
+
+            listUrl.push(`${process.env.R2_URL}/${file.Key}`);
+          } catch (error) {
+            console.error(`Error uploading file ${file.Key} to S3:`, error);
+          }
+        }));
+
+        return res.send(200, {
+          message: "success",
+          payload: listUrl,
+        });
+      } catch (error) {
+        console.log('««««« error »»»»»', error);
+        return res.send(500, {
+          message: "Internal server error",
+          error,
+        });
+      }
+    })
+  },
+
   create: async (req, res, next) => {
     try {
-      const data = req.body;
+      const data = req.body
 
-      const existSupplier = Supplier.findOne({
-        _id: data.supplierId,
-        isDeleted: false,
+      const currentDateTime = moment().tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss');
+
+      const newItem = new Product({
+        ...data,
+        createDate: currentDateTime,
       });
 
-      const existCategory = Category.findOne({
-        _id: data.categoryId,
-        isDeleted: false,
-      });
+      const result = await newItem.save();
 
-      const [doExistSupplier, doExistCategory] = await Promise.all([existSupplier, existCategory]);
-
-      const errors = [];
-      if (!doExistSupplier) {
-        errors.push('Nhà cung cấp không khả dụng');
-      }
-      if (!doExistCategory) {
-        errors.push('Danh mục không khả dụng');
-      }
-
-      if (errors.length > 0) {
-        return res.send(200, { message: `Thêm sản phẩm thất bại, ${errors}` })
-      }
-
-      const newRecord = new Product(data);
-
-      let result = await newRecord.save();
-
-      return res.send(200, {
-        message: "Thêm sản phẩm thành công",
-        payload: result,
-      });
-    } catch (err) {
+      return res.send(200, { message: "Added Success", payload: result });
+    } catch (error) {
+      console.log('««««« error »»»»»', error);
       return res.send(500, {
         message: "Internal server error",
-        error: err.message,
+        error,
       });
     }
   },

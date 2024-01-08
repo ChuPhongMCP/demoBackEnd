@@ -29,13 +29,13 @@ const passportVerifyTokenAdmin = new JwtStrategy(
 
 const passportVerifyAccountAdmin = new LocalStrategy(
   {
-    usernameField: 'email',
+    usernameField: 'username',
   },
-  async (email, password, done) => {
+  async (username, password, done) => {
     try {
       const user = await Employee.findOne({
         isDeleted: false,
-        email,
+        username,
       });
 
       if (!user) return done(null, false);

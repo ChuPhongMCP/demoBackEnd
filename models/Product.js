@@ -32,15 +32,8 @@ const productSchema = Schema(
       required: true,
     },
 
-    isFlashSale: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
-
     image: {
       type: String,
-      required: true,
     },
 
     createDate: {
@@ -50,7 +43,6 @@ const productSchema = Schema(
 
     imageHD: {
       type: String,
-      required: true,
     },
 
     imageList: {
@@ -64,8 +56,6 @@ const productSchema = Schema(
     noteDownload: {
       type: [String],
     },
-
-    view: { type: Number, min: 0, default: 0 },
   },
   {
     versionKey: false,

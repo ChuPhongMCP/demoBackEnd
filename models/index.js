@@ -1,4 +1,5 @@
 const Customer = require('./Customer');
+const Employee = require('./Employee');
 const Supplier = require('./Supplier');
 const Category = require('./Category');
 const Product = require('./Product');
@@ -8,6 +9,7 @@ const Traffic = require('./Traffic');
 
 module.exports = {
     Customer,
+    Employee,
     Supplier,
     Category,
     Product,

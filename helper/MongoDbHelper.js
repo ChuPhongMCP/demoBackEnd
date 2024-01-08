@@ -53,7 +53,7 @@ function findDocument(id ,collectionName) {
     collection
       .findOne(query)
       .then((result) => {
-        console.log('««««« result »»»»»', result);
+        // console.log('««««« result »»»»»', result);
         resolve(result);
       })
       .catch((err) => {
