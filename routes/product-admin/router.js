@@ -1,13 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-const { validateSchema } = require('../../helper')
-
 const { getDetail, getAll, search, create, update, softDelete, restore, upImageHeader, upImageHD, upImageList } = require('./controller');
-const { validationSchema, validationQuerySchema, getDetailSchema } = require('./validation');
 
 router.route('/')
-  .get(validateSchema(validationQuerySchema), getAll)
+  .get(getAll)
   // .post(validateSchema(validationSchema), create)
   .post(create)
 
@@ -20,13 +17,13 @@ router.route('/up-image-hd')
 router.route('/up-image-list')
   .post(upImageList)
 
-router.get('/search', validateSchema(validationQuerySchema), search);
+router.get('/search', search);
 
 router.route('/:id')
-  .get(validateSchema(getDetailSchema), getDetail)
-  .put(validateSchema(getDetailSchema), validateSchema(validationSchema), update)
-  .delete(validateSchema(getDetailSchema), softDelete)
-  .patch(validateSchema(getDetailSchema), restore)
+  .get(getDetail)
+  .put(update)
+  .delete(softDelete)
+  .patch(restore)
 
 
 module.exports = router;
