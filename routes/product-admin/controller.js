@@ -184,9 +184,9 @@ module.exports = {
   },
 
   upImageList: async (req, res, next) => {
-    upload.array('imageList', 4)(req, res, async (err) => {
+    upload.single('imageList')(req, res, async (err) => {
       try {
-        let listUrl = [];
+        const fileName = generateUniqueFileName(req.file.originalname)
 
         const S3 = new S3Client({
           region: 'auto',
@@ -197,37 +197,20 @@ module.exports = {
           },
         });
 
-        const listFiles = req.files.reduce((prev, file) => {
-          prev.push({
-            Body: file.buffer,
+        await S3.send(
+          new PutObjectCommand({
+            Body: req.file.buffer,
             Bucket: 'demobackend',
-            Key: generateUniqueFileName(file.originalname),
-            ContentType: file.mimetype,
-          });
+            Key: fileName,
+            ContentType: req.file.mimetype,
+          })
+        );
 
-          return prev;
-        }, []);
-
-        await Promise.all(listFiles.map(async (file) => {
-          try {
-            const params = {
-              Body: file.Body,
-              Bucket: file.Bucket,
-              Key: file.Key,
-              ContentType: file.ContentType,
-            };
-
-            await S3.send(new PutObjectCommand(params));
-
-            listUrl.push(`${process.env.R2_URL}/${file.Key}`);
-          } catch (error) {
-            console.error(`Error uploading file ${file.Key} to S3:`, error);
-          }
-        }));
+        const url = `${process.env.R2_URL}/${fileName}`
 
         return res.send(200, {
           message: "success",
-          payload: listUrl,
+          payload: url,
         });
       } catch (error) {
         console.log('««««« error »»»»»', error);
@@ -238,6 +221,62 @@ module.exports = {
       }
     })
   },
+
+  // upImageList: async (req, res, next) => {
+  //   upload.array('imageList', 4)(req, res, async (err) => {
+  //     try {
+  //       let listUrl = [];
+
+  //       const S3 = new S3Client({
+  //         region: 'auto',
+  //         endpoint: process.env.R2_ENDPOINT,
+  //         credentials: {
+  //           accessKeyId: process.env.R2_ACCESS_KEY_ID,
+  //           secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  //         },
+  //       });
+
+  //       const listFiles = req.files.reduce((prev, file) => {
+  //         prev.push({
+  //           Body: file.buffer,
+  //           Bucket: 'demobackend',
+  //           Key: generateUniqueFileName(file.originalname),
+  //           ContentType: file.mimetype,
+  //         });
+
+  //         return prev;
+  //       }, []);
+
+  //       await Promise.all(listFiles.map(async (file) => {
+  //         try {
+  //           const params = {
+  //             Body: file.Body,
+  //             Bucket: file.Bucket,
+  //             Key: file.Key,
+  //             ContentType: file.ContentType,
+  //           };
+
+  //           await S3.send(new PutObjectCommand(params));
+
+  //           listUrl.push(`${process.env.R2_URL}/${file.Key}`);
+  //         } catch (error) {
+  //           console.error(`Error uploading file ${file.Key} to S3:`, error);
+  //         }
+  //       }));
+
+  //       return res.send(200, {
+  //         message: "success",
+  //         payload: listUrl,
+  //       });
+  //     } catch (error) {
+  //       console.log('««««« error »»»»»', error);
+  //       return res.send(500, {
+  //         message: "Internal server error",
+  //         error,
+  //       });
+  //     }
+  //   })
+  // },
 
   create: async (req, res, next) => {
     try {
